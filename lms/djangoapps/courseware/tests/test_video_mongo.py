@@ -33,6 +33,7 @@ from lxml import etree
 from mock import MagicMock, Mock, patch
 from path import Path as path
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests import attr
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
@@ -1252,7 +1253,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
 
 @ddt.ddt
-class TestVideoDescriptorStudentViewJson(TestCase):
+class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
     """
     Tests for the student_view_data method on VideoDescriptor.
     """

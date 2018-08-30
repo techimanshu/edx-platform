@@ -19,7 +19,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted
 )
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
-from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
+from openedx.core.lib.cache_utils import ns_request_cached
 from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)

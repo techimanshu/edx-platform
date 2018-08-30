@@ -24,7 +24,7 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
+from openedx.core.lib.cache_utils import ns_request_cached
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)
