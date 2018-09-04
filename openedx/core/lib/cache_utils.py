@@ -4,6 +4,7 @@ Utilities related to caching.
 import collections
 import cPickle as pickle
 import functools
+import itertools
 import zlib
 
 from django.utils.encoding import force_text
@@ -82,15 +83,26 @@ def request_cached(namespace=None, arg_map_function=None, request_cache_getter=N
 
 def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     """
-    Returns a cache key based on the function's module
-    the function's name, and a stringified list of arguments
-    and a query string-style stringified list of keyword arguments.
+    Returns a cache key based on the function's module,
+    the function's name, a stringified list of arguments
+    and a stringified list of keyword arguments.
     """
     arg_map_function = arg_map_function or force_text
+
     converted_args = map(arg_map_function, args)
-    converted_kwargs = map(arg_map_function, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
+    converted_kwargs = map(arg_map_function, _sorted_kwargs_list(kwargs))
+
     cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
     return u'.'.join(cache_keys)
+
+
+def _sorted_kwargs_list(kwargs):
+    """
+    Returns a unique and deterministic serialized string from the given kwargs.
+    """
+    sorted_kwargs = sorted(kwargs.iteritems())
+    sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
+    return sorted_kwargs_list
 
 
 class memoized(object):  # pylint: disable=invalid-name
