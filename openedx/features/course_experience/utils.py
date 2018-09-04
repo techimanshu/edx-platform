@@ -10,7 +10,7 @@ from openedx.core.lib.cache_utils import request_cached
 from xmodule.modulestore.django import modulestore
 
 
-@request_cached
+@request_cached()
 def get_course_outline_block_tree(request, course_id):
     """
     Returns the root block of the course outline, with children as blocks.

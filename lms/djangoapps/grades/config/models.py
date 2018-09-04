@@ -22,7 +22,7 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     enabled_for_all_courses = BooleanField(default=False)
 
     @classmethod
-    @request_cached
+    @request_cached()
     def feature_enabled(cls, course_id=None):
         """
         Looks at the currently active configuration model to determine whether

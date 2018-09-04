@@ -30,7 +30,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        wrapped = request_cached(mock_wrapper)
+        wrapped = request_cached()(mock_wrapper)
         result = wrapped()
         self.assertEqual(result, 42)
         self.assertEqual(to_be_wrapped.call_count, 1)
@@ -53,7 +53,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        wrapped = request_cached(mock_wrapper)
+        wrapped = request_cached()(mock_wrapper)
         result = wrapped()
         self.assertEqual(result, 1)
         self.assertEqual(to_be_wrapped.call_count, 1)
@@ -89,7 +89,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        wrapped = request_cached(mock_wrapper)
+        wrapped = request_cached()(mock_wrapper)
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1)
@@ -130,7 +130,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        wrapped = request_cached(mock_wrapper)
+        wrapped = request_cached()(mock_wrapper)
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1, foo=1)
@@ -178,7 +178,7 @@ class TestRequestCachedDecorator(TestCase):
         self.assertTrue(dummy_function('Hello', u'World'), 'Should be callable with ASCII chars')
         self.assertTrue(dummy_function('H∂llå', u'Wørld'), 'Should be callable with non-ASCII chars')
 
-        wrapped = request_cached(dummy_function)
+        wrapped = request_cached()(dummy_function)
 
         self.assertTrue(wrapped('Hello', u'World'), 'Wrapper should handle ASCII only chars')
         self.assertTrue(wrapped('H∂llå', u'Wørld'), 'Wrapper should handle non-ASCII chars')
@@ -199,7 +199,7 @@ class TestRequestCachedDecorator(TestCase):
             """Simple wrapper to let us decorate our mock."""
             return to_be_wrapped(*args, **kwargs)
 
-        wrapped = request_cached(mock_wrapper)
+        wrapped = request_cached()(mock_wrapper)
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1)

@@ -387,7 +387,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return self.system.render_template('video.html', context)
 
 
-@XBlock.wants("settings", "completion")
+@XBlock.wants("request_cache", "settings", "completion")
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
                       TabsEditingDescriptor, EmptyDataRawDescriptor, LicenseMixin):
     """
@@ -1019,9 +1019,18 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         return xblock_body
 
+    @property
+    def request_cache(self):
+        """
+        Returns the request_cache from the runtime.
+        """
+        return self.runtime.service(self, "request_cache")
+
     @classmethod
-    @request_cached
-    def get_cached_val_data_for_course(cls, video_profile_names, course_id):
+    @request_cached(
+        request_cache_getter=lambda args, kwargs: args[1],
+    )
+    def get_cached_val_data_for_course(cls, request_cache, video_profile_names, course_id):
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
@@ -1054,7 +1063,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 video_profile_names.append('hls')
 
             # get and cache bulk VAL data for course
-            val_course_data = self.get_cached_val_data_for_course(video_profile_names, self.location.course_key)
+            val_course_data = self.get_cached_val_data_for_course(
+                self.request_cache,
+                video_profile_names,
+                self.location.course_key,
+            )
             val_video_data = val_course_data.get(self.edx_video_id, {})
 
             # Get the encoded videos if data from VAL is found

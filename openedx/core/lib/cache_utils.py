@@ -10,66 +10,56 @@ from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
 
 
-def request_cached(f):
+def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
     """
-    A decorator for wrapping a function and automatically handles caching its return value, as well as returning
-    that cached value for subsequent calls to the same function, with the same parameters, within a given request.
+    A function decorator that automatically handles caching its return value for
+    the duration of the request. It returns the cached value for subsequent
+    calls to the same function, with the same parameters, within a given request.
 
     Notes:
-        - We convert arguments and keyword arguments to their string form to build the cache key, so if you have
-          args/kwargs that can't be converted to strings, you're gonna have a bad time (don't do it)
-        - Cache key cardinality depends on the args/kwargs, so if you're caching a function that takes five arguments,
-          you might have deceptively low cache efficiency.  Prefer function with fewer arguments.
-        - We use the default request cache, not a named request cache. The code automatically namespaces the cache
-          key with the module and function's name.
-        - If you require a named request cache, use the ns_request_cached decorator below. Generally, you would need it
-          only if you need control of your own namespaced cache - for example, to clear out your own cache.
+        - We convert arguments and keyword arguments to their string form to build the cache key. So if you have
+          args/kwargs that can't be converted to strings, you're gonna have a bad time (don't do it).
+        - Cache key cardinality depends on the args/kwargs. So if you're caching a function that takes five arguments,
+          you might have deceptively low cache efficiency.  Prefer functions with fewer arguments.
         - WATCH OUT: Don't use this decorator for instance methods that take in a "self" argument that changes each
           time the method is called. This will result in constant cache misses and not provide the performance benefit
           you are looking for. Rather, change your instance method to a class method.
-        - Benchmark, benchmark, benchmark! if you never measure, how will you know you've improved? or regressed?
+        - Benchmark, benchmark, benchmark! If you never measure, how will you know you've improved? or regressed?
 
     Arguments:
-        f (func): the function to wrap
+        namespace (string): An optional namespace to use for the cache. By default, we use the default request cache,
+            not a namespaced request cache. Since the code automatically creates a unique cache key with the module and 
+            function's name, storing the cached value in the default cache, you won't usually need to specify a
+            namespace value.
+            But you can specify a namespace value here if you need to use your own namespaced cache - for example,
+            if you want to clear out your own cache by calling RequestCache(namespace=NAMESPACE).clear().
+        arg_map_function (function: arg->string): Function to use for mapping the wrapped function's arguments to
+            strings to use in the cache key. If not provided, defaults to force_text, which converts the given
+            argument to a string.
+        request_cache_getter (function: args, kwargs->RequestCache): Function that returns the RequestCache to use.
+            If not provided, defaults to edx_django_utils.cache.RequestCache.  If None, the function's return values
+            are not cached.
 
     Returns:
         func: a wrapper function which will call the wrapped function, passing in the same args/kwargs,
               cache the value it returns, and return that cached value for subsequent calls with the
-              same args/kwargs within a single request
+              same args/kwargs within a single request.
     """
-    return ns_request_cached()(f)
-
-
-def ns_request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
-    """
-    Same as request_cached above, except an optional namespace can be passed in to compartmentalize the cache.
-
-    Arguments:
-        namespace (string): An optional namespace to use for the cache.  Useful if the caller wants to manage
-            their own sub-cache by, for example, calling RequestCache(namespace=NAMESPACE).clear() for their own
-            namespace.
-        arg_map_function (function: arg->string): Function to use for mapping the wrapped function's arguments to
-            strings to use in the cache key. If not provided, defaults to force_text, which converts the given
-            argument to a string.
-        request_cache_getter (function: args->RequestCache): Function that returns the RequestCache to use. If not
-            provided, defaults to edx_django_utils.cache.RequestCache.  If None, the function's return values are
-            not cached.
-    """
-    def outer_wrapper(f):
+    def decorator(f):
         """
-        Outer wrapper that decorates the given function
-
         Arguments:
             f (func): the function to wrap
         """
-        def inner_wrapper(*args, **kwargs):
+        # @functools.wraps(f)
+        def _decorator(*args, **kwargs):
             """
-            Wrapper function to decorate with.
+            Arguments:
+                args, kwargs: values passed into the wrapped function
             """
             # Check to see if we have a result in cache.  If not, invoke our wrapped
             # function.  Cache and return the result to the caller.
             if request_cache_getter:
-                request_cache = request_cache_getter(args)
+                request_cache = request_cache_getter(args, kwargs)
             else:
                 request_cache = RequestCache(namespace)
 
@@ -86,8 +76,8 @@ def ns_request_cached(namespace=None, arg_map_function=None, request_cache_gette
 
             return result
 
-        return inner_wrapper
-    return outer_wrapper
+        return _decorator
+    return decorator
 
 
 def _func_call_cache_key(func, arg_map_function, *args, **kwargs):

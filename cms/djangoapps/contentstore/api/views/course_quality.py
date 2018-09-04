@@ -171,7 +171,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
         )
 
     @classmethod
-    @request_cached
+    @request_cached()
     def _get_subsections_and_units(cls, course, request):
         """
         Returns {subsection_key: {unit_key: {num_leaf_blocks: <>, leaf_block_types: set(<>) }}}
@@ -200,7 +200,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
         return subsection_dict
 
     @classmethod
-    @request_cached
+    @request_cached()
     def _get_sections(cls, course):
         return cls._get_all_children(course)
 

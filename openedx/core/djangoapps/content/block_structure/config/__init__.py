@@ -24,7 +24,7 @@ def waffle():
     return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'BlockStructure: ')
 
 
-@request_cached
+@request_cached()
 def num_versions_to_keep():
     """
     Returns and caches the current setting for num_versions_to_keep.
@@ -32,7 +32,7 @@ def num_versions_to_keep():
     return BlockStructureConfiguration.current().num_versions_to_keep
 
 
-@request_cached
+@request_cached()
 def cache_timeout_in_seconds():
     """
     Returns and caches the current setting for cache_timeout_in_seconds.

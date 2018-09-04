@@ -148,7 +148,7 @@ def add_lookup(namespace, directory, package=None, prepend=False):
     templates.add_directory(directory, prepend=prepend)
 
 
-@request_cached
+@request_cached()
 def lookup_template(namespace, name):
     """
     Look up a Mako template by namespace and name.

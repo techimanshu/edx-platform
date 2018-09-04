@@ -565,7 +565,7 @@ def is_last_random_cohort(user_group):
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
 
 
-@request_cached
+@request_cached()
 def _get_course_cohort_settings(course_key):
     """
     Return cohort settings for a course. NOTE that the only non-deprecated fields in

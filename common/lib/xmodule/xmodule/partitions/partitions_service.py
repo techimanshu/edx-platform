@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 FEATURES = getattr(settings, 'FEATURES', {})
 
 
-@request_cached
+@request_cached()
 def get_all_partitions_for_course(course, active_only=False):
     """
     A method that returns all `UserPartitions` associated with a course, as a List.

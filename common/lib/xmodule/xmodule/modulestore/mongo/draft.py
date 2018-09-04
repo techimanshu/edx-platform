@@ -12,7 +12,7 @@ import logging
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
-from openedx.core.lib.cache_utils import ns_request_cached
+from openedx.core.lib.cache_utils import request_cached
 from xblock.core import XBlock
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
@@ -651,11 +651,11 @@ class DraftModuleStore(MongoModuleStore):
         """
         return self._cached_has_changes(self.request_cache, xblock)
 
-    @ns_request_cached(
-        # use the xBlock's location value in the cache key
+    @request_cached(
+        # use the XBlock's location value in the cache key
         arg_map_function=lambda arg: unicode(arg.location if isinstance(arg, XBlock) else arg),
         # use this store's request_cache
-        request_cache_getter=lambda args: args[1],
+        request_cache_getter=lambda args, kwargs: args[1],
     )
     def _cached_has_changes(self, request_cache, xblock):
         """

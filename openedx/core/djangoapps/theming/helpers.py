@@ -25,7 +25,7 @@ from openedx.core.lib.cache_utils import request_cached
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
-@request_cached
+@request_cached()
 def get_template_path(relative_path, **kwargs):
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
