@@ -265,7 +265,7 @@ class VideoStudentViewHandlers(object):
 
         if add_attachment_header:
             headerlist.append(
-                ('Content-Disposition', 'attachment; filename="{}"'.format(filename))
+                ('Content-Disposition', 'attachment; filename=u"{}"'.format(filename))
             )
 
         response = Response(
