@@ -503,7 +503,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.body, 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
-        self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
+        self.assertEqual(response.headers['Content-Disposition'], u'attachment; filename="en_塞.srt"')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
     @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
@@ -527,7 +527,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         # Expected response
         expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
         expected_headers = {
-            'Content-Disposition': 'attachment; filename="edx.srt"',
+            'Content-Disposition': u'attachment; filename="edx.srt"',
             'Content-Language': u'en',
             'Content-Type': 'application/x-subrip; charset=utf-8'
         }
