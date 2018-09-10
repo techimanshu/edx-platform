@@ -20,17 +20,23 @@ def render_xblock_by_journal_access(request, usage_key_string):
     It disables 'check_if_enrolled' flag by checking that user has access on journal.
     """
     block_id = UsageKey.from_string(usage_key_string).block_id
-    user_access = get_cache_data(request, block_id)
+    user_access = _get_cache_data(request, block_id)
     if not user_access:
         raise PermissionDenied()
     return render_xblock(request, usage_key_string, check_if_enrolled=False)
 
 
-def get_cache_data(request, block_id):
+def _get_cache_data(request, block_id):
     """
     Get the cache data from cache if not then hit the end point
     in journals to fetch the access of user on given block_id.
     """
+    if request.user.is_staff:
+        return True
+
+    if not request.user.is_authenticated:
+        return False
+
     date_format = '%Y-%m-%d'
     journal_uuid = request.GET.get('journal_uuid')
     cache_key = XBLOCK_JOURNAL_ACCESS_KEY.format(
